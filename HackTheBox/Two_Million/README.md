@@ -90,14 +90,24 @@ Then register...
 
 ![alt text](./img/account_page.png)
 
-and we are logged in.
-
-### Logged In
-
-Once we are logged in, we are presented with a HTB page.
+Once logged in, we are presented with a HTB page.
 
 On the left side there is a menu, from all the options only 4 are features(Dashboard, Rules, Change Log, Acces).
 
 Between the functional features, actions seems to be the most interesting one.
 
-continiou...
+![alt text](./img/acces.png)
+
+The acces feature comprehends of a connection pack generator qhich can be regenerated. Each time we press each button, a '.ovpn' gets downloaded.
+
+Lets see what kind of curl does the button on the background.
+
+![alt text](./img/burp.png)
+
+It can bee seen that the button sens a petition to the api so it sends the vpn file. 
+
+Seeing that there is an accesible api behind(as we proved before whith the acces-code) we could try to procede with an <strong>api enumeration</strong>.
+
+## API Enumeration
+
+On investigation...
