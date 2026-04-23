@@ -81,4 +81,34 @@ As I saw the option to see which version the flowise was operating I went straig
 
 Now, that we now the version, lets check for compatible exploits.
 
+Flowise 3.0.5 is affected by different exploits. Between them, CVE-2025-58434 (Unauthenticated Account Takeover) seems the right choise, considering it depends on the /fotgot-password endpoint inside the api.
+
+Following the instructions on the exploit repository I found(https://github.com/advisories/GHSA-wgpv-6j63-x5ph), the only thing we need is a victims email.
+
+```
+curl -i -X POST "https://<target>/api/v1/account/forgot-password" \
+  -H "Content-Type: application/json" \
+  -d '{"user":{"email":"<victim@example.com>"}}'
+```
+
+Following the logic of HTB I decided to try for emails with "@silentium.htb" as domiain.
+
+In the principal page, there are three names which we could try before using another enumeration method:
+
+![alt text](./img/leadership.png)
+
+Usually, in HTB machines, the username "ben" is related to sensible information and vulnerabilities. Therefore thats the first one we'll try.
+
+![alt text](./img/ben.png)
+
+<strong>It worked!</strong>
+
+Through IA I found the following:
+
+![alt text](./img/ia.png)
+
+Now with the 'tempToken' lets try a password reset:
+
+![alt text](./img/token.png)
+
 ONGOING...
