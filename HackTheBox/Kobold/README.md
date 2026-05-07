@@ -1,4 +1,4 @@
-Welcome to my version of the HTB machine "Kobold"ç
+Welcome to my version of the HTB machine "Kobold"
 
 ![alt text](./img/kobold.png)
 
