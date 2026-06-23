@@ -1,4 +1,4 @@
-Welcome to my writeup version of the HTB machine Cap.
+Welcome to my writeup version of the HTB machine Dancing.
 
 ![alt text](./img/Dancing.png)
 
