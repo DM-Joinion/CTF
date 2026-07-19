@@ -1,4 +1,4 @@
-Welcome to my writeup version of the HTB machine Appointment.
+Welcome to my writeup version of the HTB machine Responder.
 
 ![alt text](./img/Responder.png)
 
