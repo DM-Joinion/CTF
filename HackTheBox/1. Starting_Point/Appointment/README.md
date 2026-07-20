@@ -1,5 +1,3 @@
-Welcome to my writeup version of the HTB machine Appointment.
-
 ![alt text](./img/Appointment.png)
 
 # Enumeration

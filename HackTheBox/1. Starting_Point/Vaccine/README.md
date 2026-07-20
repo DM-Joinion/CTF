@@ -1,5 +1,3 @@
-Welcome to my version of the HTB machine Vaccine.
-
 ![alt text](./img/vaccine.png)
 
 # TASK 1

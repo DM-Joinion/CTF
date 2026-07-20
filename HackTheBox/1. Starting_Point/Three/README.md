@@ -1,5 +1,3 @@
-Welcome to my writeup version of the HTB machine Three.
-
 ![alt text](./img/three.png)
 
 # TASK 1

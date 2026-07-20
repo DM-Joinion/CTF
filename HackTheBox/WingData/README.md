@@ -1,5 +1,3 @@
-Welcome to my version of the HTB machine "Win"
-
 ![alt text](./img/WingData.png)
 
 >Note: This machine is currently active, the writeup will be uploaded once the machine gets retired.

@@ -1,5 +1,3 @@
-Welcome to my writeup version of the HTB machine Cap.
-
 ![alt text](./img/cap.png)
 
 # Enumeration

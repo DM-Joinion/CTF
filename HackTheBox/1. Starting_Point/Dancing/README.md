@@ -1,5 +1,3 @@
-Welcome to my writeup version of the HTB machine Dancing.
-
 ![alt text](./img/Dancing.png)
 
 # Enumeration

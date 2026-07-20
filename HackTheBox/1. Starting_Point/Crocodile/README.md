@@ -1,5 +1,3 @@
-Welcome to my writeup version of the HTB machine crocodile.
-
 ![alt text](./img/crocodile.png)
 
 # Enumeration

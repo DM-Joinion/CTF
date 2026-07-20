@@ -1,5 +1,3 @@
-Welcome to my writeup version of the machine "Two Million".
-
 ![alt text](./img/twomillion.png)
 
 # Enumeration

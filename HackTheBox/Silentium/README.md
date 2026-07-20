@@ -1,5 +1,3 @@
-Welcome to my writeup version of the machine Silentium
-
 ![alt text](./img/Silentium.png)
 >Note: This machine is currently active, the writeup will be uploaded once the machine gets retired.
 
