@@ -52,7 +52,7 @@ One of the most common files used by pentesters is: `/windows/system32/drivers/e
 
 This file will follow `../../../../`, which we use to escape whateveer directory the website may be hosted in.
 
-It would look like this:
+It would look like this:<br>
 ![alt text](./img/lfi1.png)
 
 We can see that the file has been included. In this case a unsanitized "include()" function in php.
@@ -85,7 +85,7 @@ Having a hash, the next step would be to unhash it to see its content.
 
 > John the Ripper, also known as JtR, is software designed to recover passwords from their hashes, which are encrypted representations of the original passwords.
 
-After dehashing
+After dehashing<br>
 ![alt text](./img/john.png)
 
 # WinRM
