@@ -10,6 +10,7 @@
 
 ## Resume
 
+Discover website with nmap then add on /etc/hosts the ip. With gobuster discover the /admin directory. Exploit CVE-2025-32432 to access www-data user then search for database on .env file. Change to adam user, then exploit telnet's CVE-2026-24061 and aquire root. 
 
 ---
 
@@ -78,15 +79,15 @@ Nmap done: 1 IP address (1 host up) scanned in 23.19 seconds
 
 ### Services Resume
 
-- Puerto 22/tcp — SSH: Protocol to maintain a connexion between two devices
-- Puerto 80/tcp — HTTP: Web aplication/page redirected to http://orion.htb/
+- Port 22/tcp — SSH: Protocol to maintain a connexion between two devices
+- Port 80/tcp — HTTP: Web aplication/page redirected to http://orion.htb/
 
 ### /etc/hosts
 
 To access the webpage we add at the end of the `/etc/hosts` file the redirection to the mentioned page:
 
 ```
-echo "[ip] connected.htb" | sudo tee -a /etc/hosts
+echo "[ip] orion.htb" | sudo tee -a /etc/hosts
 ```
 
 
@@ -236,7 +237,7 @@ mysql -h 127.0.0.1 -u root -p'SuperSecureCraft123Pass!' orion -e "SHOW TABLES;"
 ```
 
 ```bash
-
+mysql -h 127.0.0.1 -u root -p'SuperSecureCraft123Pass!' orion -e "SELECT * FROM users;"
 ```
 
 Inside we'll find a hash for `admin`:
