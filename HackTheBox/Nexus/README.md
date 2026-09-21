@@ -139,11 +139,8 @@ Clicking on the user profile, the version is `Krayin CRM 2.2.0`. There is a CVE 
 
 ###  <u>CVE-2026-38526</u>
 
-- Explain the exploit
 
-```bash
-[used commands]
-```
+
 
 ---
 
